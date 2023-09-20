@@ -1,0 +1,17 @@
+<div class="card" style="background: {{cardbackgroundcolor}}">
+    <div class="card-body">
+        <p class="card-text">{{message}}</p>
+        <p class="card-text">{{postedby}}</p>
+        <p class="card-text"><small class="text-muted">{{timecreated}}</small></p>
+        {{#deletePermission}}
+        <p class="card-footer text-center">
+            <a href="{{editUrl}}" role="button">
+                {{{editIcon}}}
+            </a>
+            <a href="{{{deleteUrl}}}" role="button">
+                {{{deleteIcon}}}
+            </a>
+        </p>
+        {{/deletePermission}}
+    </div>
+</div>
