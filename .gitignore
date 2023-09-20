@@ -56,3 +56,8 @@ moodle-plugin-ci.phar
 .hugo_build.lock
 phpcs.xml
 jsconfig.json
+/local/codechecker
+/local/moodlecheck
+/local/pluginskel
+/local/adminer
+/admin/tool/pluginskel/

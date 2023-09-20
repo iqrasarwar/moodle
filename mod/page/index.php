@@ -27,7 +27,7 @@ require('../../config.php');
 
 $id = required_param('id', PARAM_INT); // course id
 
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_course_login($course, true);
 $PAGE->set_pagelayout('incourse');
@@ -44,7 +44,7 @@ $strintro        = get_string('moduleintro');
 $strlastmodified = get_string('lastmodified');
 
 $PAGE->set_url('/mod/page/index.php', array('id' => $course->id));
-$PAGE->set_title($course->shortname.': '.$strpages);
+$PAGE->set_title($course->shortname . ': ' . $strpages);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($strpages);
 echo $OUTPUT->header();
@@ -60,12 +60,12 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable mod_index';
 
 if ($usesections) {
-    $strsectionname = get_string('sectionname', 'format_'.$course->format);
-    $table->head  = array ($strsectionname, $strname, $strintro);
-    $table->align = array ('center', 'left', 'left');
+    $strsectionname = get_string('sectionname', 'format_' . $course->format);
+    $table->head  = array($strsectionname, $strname, $strintro);
+    $table->align = array('center', 'left', 'left');
 } else {
-    $table->head  = array ($strlastmodified, $strname, $strintro);
-    $table->align = array ('left', 'left', 'left');
+    $table->head  = array($strlastmodified, $strname, $strintro);
+    $table->align = array('left', 'left', 'left');
 }
 
 $modinfo = get_fast_modinfo($course);
@@ -84,15 +84,16 @@ foreach ($pages as $page) {
             $currentsection = $page->section;
         }
     } else {
-        $printsection = '<span class="smallinfo">'.userdate($page->timemodified)."</span>";
+        $printsection = '<span class="smallinfo">' . userdate($page->timemodified) . "</span>";
     }
 
-    $class = $page->visible ? '' : 'class="dimmed"'; // hidden modules are dimmed
+    $class = $page->visible ? '' : 'class="dimmed"';
 
-    $table->data[] = array (
+    $table->data[] = array(
         $printsection,
-        "<a $class href=\"view.php?id=$cm->id\">".format_string($page->name)."</a>",
-        format_module_intro('page', $page, $cm->id));
+        "<a $class href=\"view.php?id=$cm->id\">" . format_string($page->name) . "</a>",
+        format_module_intro('page', $page, $cm->id)
+    );
 }
 
 echo html_writer::table($table);

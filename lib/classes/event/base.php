@@ -53,7 +53,8 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read mixed $other array or scalar, can not contain objects
  * @property-read int $timecreated
  */
-abstract class base implements \IteratorAggregate {
+abstract class base implements \IteratorAggregate
+{
 
     /**
      * Other level.
@@ -126,7 +127,8 @@ abstract class base implements \IteratorAggregate {
     private static $fields = array(
         'eventname', 'component', 'action', 'target', 'objecttable', 'objectid', 'crud', 'edulevel', 'contextid',
         'contextlevel', 'contextinstanceid', 'userid', 'courseid', 'relateduserid', 'anonymous', 'other',
-        'timecreated');
+        'timecreated'
+    );
 
     /** @var array simple record cache */
     private $recordsnapshots = array();
@@ -134,7 +136,8 @@ abstract class base implements \IteratorAggregate {
     /**
      * Private constructor, use create() or restore() methods instead.
      */
-    final private function __construct() {
+    final private function __construct()
+    {
         $this->data = array_fill_keys(self::$fields, null);
 
         // Define some basic details.
@@ -144,7 +147,7 @@ abstract class base implements \IteratorAggregate {
             throw new \coding_exception("Invalid event class name '$classname', it must be defined in component\\event\\
                     namespace");
         }
-        $this->data['eventname'] = '\\'.$classname;
+        $this->data['eventname'] = '\\' . $classname;
         $this->data['component'] = $parts[0];
 
         $pos = strrpos($parts[2], '_');
@@ -170,7 +173,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @throws \coding_exception
      */
-    public static final function create(array $data = null) {
+    public static final function create(array $data = null)
+    {
         global $USER, $CFG;
 
         $data = (array)$data;
@@ -213,13 +217,10 @@ abstract class base implements \IteratorAggregate {
             if (isset($data['context'])) {
                 debugging('Context was already set in init() method, ignoring context parameter', DEBUG_DEVELOPER);
             }
-
         } else if (!empty($data['context'])) {
             $event->context = $data['context'];
-
         } else if (!empty($data['contextid'])) {
             $event->context = \context::instance_by_id($data['contextid'], MUST_EXIST);
-
         } else {
             throw new \coding_exception('context (or contextid) is a required event property, system context may be hardcoded in init() method.');
         }
@@ -248,13 +249,10 @@ abstract class base implements \IteratorAggregate {
             foreach ($data as $key => $ignored) {
                 if ($key === 'context') {
                     continue;
-
                 } else if (in_array($key, $automatickeys)) {
                     debugging("Data key '$key' is not allowed in \\core\\event\\base::create() method, it is set automatically", DEBUG_DEVELOPER);
-
                 } else if (in_array($key, $initkeys)) {
                     debugging("Data key '$key' is not allowed in \\core\\event\\base::create() method, you need to set it in init() method", DEBUG_DEVELOPER);
-
                 } else if (!in_array($key, self::$fields)) {
                     debugging("Data key '$key' does not exist in \\core\\event\\base");
                 }
@@ -294,7 +292,8 @@ abstract class base implements \IteratorAggregate {
      *
      * Throw \coding_exception or debugging() notice in case of any problems.
      */
-    protected function validate_data() {
+    protected function validate_data()
+    {
         // Override if you want to validate event properties when
         // creating new events.
     }
@@ -306,13 +305,14 @@ abstract class base implements \IteratorAggregate {
      *
      * @return string
      */
-    public static function get_name() {
+    public static function get_name()
+    {
         // Override in subclass with real lang string.
         $parts = explode('\\', get_called_class());
         if (count($parts) !== 3) {
             return get_string('unknownevent', 'error');
         }
-        return $parts[0].': '.str_replace('_', ' ', $parts[2]);
+        return $parts[0] . ': ' . str_replace('_', ' ', $parts[2]);
     }
 
     /**
@@ -325,7 +325,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return string
      */
-    public static function get_name_with_info() {
+    public static function get_name_with_info()
+    {
         $return = static::get_name();
 
         if (static::is_deprecated()) {
@@ -340,7 +341,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return string
      */
-    public function get_description() {
+    public function get_description()
+    {
         return null;
     }
 
@@ -355,7 +357,8 @@ abstract class base implements \IteratorAggregate {
      * @param int|\stdClass $user_or_id ID of the user.
      * @return bool True if the user can view the event, false otherwise.
      */
-    public function can_view($user_or_id = null) {
+    public function can_view($user_or_id = null)
+    {
         debugging('can_view() method is deprecated, use anonymous flag instead if necessary.', DEBUG_DEVELOPER);
         return is_siteadmin($user_or_id);
     }
@@ -367,7 +370,8 @@ abstract class base implements \IteratorAggregate {
      * @param array $logextra the format is standardised by logging API
      * @return bool|\core\event\base
      */
-    public static final function restore(array $data, array $logextra) {
+    public static final function restore(array $data, array $logextra)
+    {
         $classname = $data['eventname'];
         $component = $data['component'];
         $action = $data['action'];
@@ -418,7 +422,8 @@ abstract class base implements \IteratorAggregate {
      * @param array $logextra
      * @return unknown_logged
      */
-    protected static final function restore_unknown(array $data, array $logextra) {
+    protected static final function restore_unknown(array $data, array $logextra)
+    {
         $classname = '\core\event\unknown_logged';
 
         /** @var unknown_logged $event */
@@ -438,7 +443,8 @@ abstract class base implements \IteratorAggregate {
      * @param \stdClass $legacy
      * @return base
      */
-    public static final function restore_legacy($legacy) {
+    public static final function restore_legacy($legacy)
+    {
         $classname = get_called_class();
         /** @var base $event */
         $event = new $classname();
@@ -450,7 +456,7 @@ abstract class base implements \IteratorAggregate {
         $component = 'legacy';
         if ($legacy->cmid) {
             $context = \context_module::instance($legacy->cmid, IGNORE_MISSING);
-            $component = 'mod_'.$legacy->module;
+            $component = 'mod_' . $legacy->module;
         } else if ($legacy->course) {
             $context = \context_course::instance($legacy->course, IGNORE_MISSING);
         }
@@ -460,7 +466,7 @@ abstract class base implements \IteratorAggregate {
 
         $event->data = array();
 
-        $event->data['eventname'] = $legacy->module.'_'.$legacy->action;
+        $event->data['eventname'] = $legacy->module . '_' . $legacy->action;
         $event->data['component'] = $component;
         $event->data['action'] = $legacy->action;
         $event->data['target'] = null;
@@ -545,7 +551,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return string the name of the restore mapping the objectid links to
      */
-    public static function get_objectid_mapping() {
+    public static function get_objectid_mapping()
+    {
         debugging('In order to restore course logs accurately the event "' . get_called_class() . '" must define the
             function get_objectid_mapping().', DEBUG_DEVELOPER);
 
@@ -586,7 +593,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return array an array of other values and their corresponding mapping
      */
-    public static function get_other_mapping() {
+    public static function get_other_mapping()
+    {
         debugging('In order to restore course logs accurately the event "' . get_called_class() . '" must define the
             function get_other_mapping().', DEBUG_DEVELOPER);
     }
@@ -597,7 +605,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return array Static information about the event.
      */
-    public static final function get_static_info() {
+    public static final function get_static_info()
+    {
         /** Var \core\event\base $event. */
         $event = new static();
         // Set static event data specific for child class.
@@ -621,7 +630,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return string An explanation of the event formatted in markdown style.
      */
-    public static function get_explanation() {
+    public static function get_explanation()
+    {
         $ref = new \ReflectionClass(get_called_class());
         $docblock = $ref->getDocComment();
 
@@ -658,7 +668,8 @@ abstract class base implements \IteratorAggregate {
      * Returns event context.
      * @return \context
      */
-    public function get_context() {
+    public function get_context()
+    {
         if (isset($this->context)) {
             return $this->context;
         }
@@ -670,7 +681,8 @@ abstract class base implements \IteratorAggregate {
      * Returns relevant URL, override in subclasses.
      * @return \moodle_url
      */
-    public function get_url() {
+    public function get_url()
+    {
         return null;
     }
 
@@ -679,7 +691,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return array All elements are scalars except the 'other' field which is array.
      */
-    public function get_data() {
+    public function get_data()
+    {
         return $this->data;
     }
 
@@ -692,7 +705,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return array the format is standardised by logging API
      */
-    public function get_logextra() {
+    public function get_logextra()
+    {
         return $this->logextra;
     }
 
@@ -703,7 +717,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return null|string legacy event name
      */
-    public static function get_legacy_eventname() {
+    public static function get_legacy_eventname()
+    {
         return null;
     }
 
@@ -714,7 +729,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return mixed
      */
-    protected function get_legacy_eventdata() {
+    protected function get_legacy_eventdata()
+    {
         return null;
     }
 
@@ -725,7 +741,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return null|array of parameters to be passed to legacy add_to_log() function.
      */
-    protected function get_legacy_logdata() {
+    protected function get_legacy_logdata()
+    {
         return null;
     }
 
@@ -736,7 +753,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @throws \coding_exception
      */
-    protected final function validate_before_trigger() {
+    protected final function validate_before_trigger()
+    {
         global $DB, $CFG;
 
         if (empty($this->data['crud'])) {
@@ -796,7 +814,8 @@ abstract class base implements \IteratorAggregate {
     /**
      * Trigger event.
      */
-    public final function trigger() {
+    public final function trigger()
+    {
         global $CFG;
 
         if ($this->restored) {
@@ -842,7 +861,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return bool
      */
-    public final function is_triggered() {
+    public final function is_triggered()
+    {
         return $this->triggered;
     }
 
@@ -851,7 +871,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return bool
      */
-    public final function is_dispatched() {
+    public final function is_dispatched()
+    {
         return $this->dispatched;
     }
 
@@ -860,7 +881,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return bool
      */
-    public final function is_restored() {
+    public final function is_restored()
+    {
         return $this->restored;
     }
 
@@ -875,7 +897,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @throws \coding_exception if used after ::trigger()
      */
-    public final function add_record_snapshot($tablename, $record) {
+    public final function add_record_snapshot($tablename, $record)
+    {
         global $DB, $CFG;
 
         if ($this->triggered) {
@@ -899,8 +922,8 @@ abstract class base implements \IteratorAggregate {
                 $columns = $DB->get_columns($tablename);
                 $missingfields = array_diff(array_keys($columns), array_keys((array)$record));
                 if (!empty($missingfields)) {
-                    debugging("Fields list in snapshot record does not match fields list in '$tablename'. Record is missing fields: ".
-                            join(', ', $missingfields), DEBUG_DEVELOPER);
+                    debugging("Fields list in snapshot record does not match fields list in '$tablename'. Record is missing fields: " .
+                        join(', ', $missingfields), DEBUG_DEVELOPER);
                 }
             }
         }
@@ -916,7 +939,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @throws \coding_exception if used after ::restore()
      */
-    public final function get_record_snapshot($tablename, $id) {
+    public final function get_record_snapshot($tablename, $id)
+    {
         global $DB;
 
         if ($this->restored) {
@@ -924,10 +948,10 @@ abstract class base implements \IteratorAggregate {
         }
 
         if (isset($this->recordsnapshots[$tablename][$id])) {
-            return clone($this->recordsnapshots[$tablename][$id]);
+            return clone ($this->recordsnapshots[$tablename][$id]);
         }
 
-        $record = $DB->get_record($tablename, array('id'=>$id));
+        $record = $DB->get_record($tablename, array('id' => $id));
         $this->recordsnapshots[$tablename][$id] = $record;
 
         return $record;
@@ -939,7 +963,8 @@ abstract class base implements \IteratorAggregate {
      * @param string $name
      * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         if ($name === 'level') {
             debugging('level property is deprecated, use edulevel property instead', DEBUG_DEVELOPER);
             return $this->data['edulevel'];
@@ -962,7 +987,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @throws \coding_exception
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         throw new \coding_exception('Event properties must not be modified.');
     }
 
@@ -972,7 +998,8 @@ abstract class base implements \IteratorAggregate {
      * @param string $name
      * @return bool
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         if ($name === 'level') {
             debugging('level property is deprecated, use edulevel property instead', DEBUG_DEVELOPER);
             return isset($this->data['edulevel']);
@@ -985,7 +1012,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return \ArrayIterator
      */
-    public function getIterator(): \Traversable {
+    public function getIterator(): \Traversable
+    {
         return new \ArrayIterator($this->data);
     }
 
@@ -998,7 +1026,8 @@ abstract class base implements \IteratorAggregate {
      *
      * @return boolean
      */
-    public static function is_deprecated() {
+    public static function is_deprecated()
+    {
         return false;
     }
 }
